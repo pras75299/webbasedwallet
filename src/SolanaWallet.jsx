@@ -23,8 +23,8 @@ export function SolanaWallet({ mnemonic }) {
       >
         Add wallet
       </button>
-      {publicKeys.map((p) => (
-        <div>{p.toBase58()}</div>
+      {publicKeys.map((p, index) => (
+        <div key={index}>{p.toBase58()}</div>
       ))}
     </div>
   );

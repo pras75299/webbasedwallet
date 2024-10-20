@@ -23,8 +23,8 @@ export const EthWallet = ({ mnemonic }) => {
         Add ETH wallet
       </button>
 
-      {addresses.map((p) => (
-        <div>Eth - {p}</div>
+      {addresses.map((p, index) => (
+        <div key={index}>Eth - {p}</div>
       ))}
     </div>
   );

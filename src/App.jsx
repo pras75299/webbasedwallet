@@ -6,21 +6,53 @@ import { EthWallet } from "./EthWallet";
 
 function App() {
   const [mnemonic, setMnemonic] = useState("");
+  const [isMnemonicVisible, setMnemonicVisible] = useState(true);
+  const isDisabled = !mnemonic;
   return (
-    <>
-      <h1>Web Based Wallet</h1>
-      <input type="text" value={mnemonic}></input>
+    <div className="container">
+      <h1>Secret Phrase</h1>
       <button
+        className="mnemonic-button"
         onClick={async function () {
           const mn = await generateMnemonic();
           setMnemonic(mn);
         }}
       >
-        Create Seed Phrase
+        Generate Secret Phrase
       </button>
-      <SolanaWallet />
-      <EthWallet />
-    </>
+
+      <div className="mnemonic-container">
+        <div className="mnemonic-header">
+          <button
+            className="hide-show-button"
+            onClick={() => setMnemonicVisible(!isMnemonicVisible)}
+          >
+            {isMnemonicVisible ? "Hide Secret Phrase" : "Show Secret Phrase"}
+          </button>
+          <button className="copy-button">Copy Grid</button>
+        </div>
+
+        {isMnemonicVisible && (
+          <div className="mnemonic-grid">
+            {mnemonic.split(" ").map((word, index) => (
+              <div key={index}>{word}</div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="wallet-container">
+        <div className="wallet-box">
+          <h2>Generate SOLANA Wallet</h2>
+          <SolanaWallet mnemonic={mnemonic} disabled={isDisabled} />
+        </div>
+
+        <div className="wallet-box">
+          <h2>Generate ETHEREUM Wallet</h2>
+          <EthWallet mnemonic={mnemonic} disabled={isDisabled} />
+        </div>
+      </div>
+    </div>
   );
 }
 

@@ -4,13 +4,15 @@ import { derivePath } from "ed25519-hd-key";
 import { Keypair } from "@solana/web3.js";
 import nacl from "tweetnacl";
 
-export function SolanaWallet({ mnemonic }) {
+export function SolanaWallet({ mnemonic, disabled }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [publicKeys, setPublicKeys] = useState([]);
 
   return (
     <div>
       <button
+        className="wallet-button"
+        disabled={disabled}
         onClick={function () {
           const seed = mnemonicToSeed(mnemonic);
           const path = `m/44'/501'/${currentIndex}'/0'`;
@@ -21,10 +23,13 @@ export function SolanaWallet({ mnemonic }) {
           setPublicKeys([...publicKeys, keypair.publicKey]);
         }}
       >
-        Add wallet
+        Generate SOLANA Wallet
       </button>
-      {publicKeys.map((p, index) => (
-        <div key={index}>{p.toBase58()}</div>
+
+      {publicKeys.map((publicKey, index) => (
+        <div key={index}>
+          <input value={`Address: ${publicKey.toBase58()}`} readOnly />
+        </div>
       ))}
     </div>
   );

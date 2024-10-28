@@ -9,9 +9,9 @@ export function SolanaWallet({ mnemonic, disabled }) {
   const [publicKeys, setPublicKeys] = useState([]);
 
   return (
-    <div>
+    <div className="solana-wallet">
       <button
-        className="wallet-button"
+        className="wallet-button dark:bg-gray-700 bg-gray-300 dark:hover:bg-gray-600 hover:bg-gray-400 text-gray-900 dark:text-gray-100 py-2 px-4 rounded mb-4"
         disabled={disabled}
         onClick={function () {
           const seed = mnemonicToSeed(mnemonic);
@@ -27,8 +27,15 @@ export function SolanaWallet({ mnemonic, disabled }) {
       </button>
 
       {publicKeys.map((publicKey, index) => (
-        <div key={index}>
-          <input value={`Address: ${publicKey.toBase58()}`} readOnly />
+        <div
+          key={index}
+          className="dark:bg-gray-800 bg-gray-200 p-2 rounded mb-2"
+        >
+          <input
+            value={`Address: ${publicKey.toBase58()}`}
+            readOnly
+            className="bg-transparent dark:text-gray-100 text-gray-900 w-full"
+          />
         </div>
       ))}
     </div>

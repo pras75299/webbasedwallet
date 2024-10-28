@@ -10,7 +10,7 @@ function App() {
   const isDisabled = !mnemonic;
   return (
     <div className="container">
-      <h1>Secret Phrase</h1>
+      <h1 className="text-3xl font-bold underline">Secret Phrase</h1>
       <button
         className="mnemonic-button"
         onClick={async function () {

@@ -18,22 +18,25 @@ function AppContent() {
   }, [themeMode]);
 
   return (
-    <div className="container mx-auto p-4 dark:bg-gray-900 bg-white dark:text-gray-100 text-gray-900 min-h-screen">
-      <h1 className="text-3xl font-bold underline dark:text-white text-gray-800">
-        Secret Phrase
-      </h1>
+    <div className="w-full mx-auto p-4 dark:bg-gray-900 bg-white dark:text-gray-100 text-gray-900 min-h-screen">
       <ThemeButton />
-      <button
-        className="mnemonic-button dark:bg-gray-700 bg-gray-200 dark:hover:bg-gray-600 hover:bg-gray-300 text-gray-900 dark:text-gray-100 py-2 px-4 rounded mt-4"
-        onClick={async function () {
-          const mn = await generateMnemonic();
-          setMnemonic(mn);
-        }}
-      >
-        Generate Secret Phrase
-      </button>
+      <header className="space-x-4 flex align-middle justify-between dark:bg-gray-900 bg-blue-500 p-4 rounded">
+        <h1 className="text-3xl font-bold dark:text-white text-gray-800">
+          Secret Phrase
+        </h1>
 
-      <div className="mnemonic-container dark:bg-gray-800 bg-gray-100 rounded-lg mt-4 p-4">
+        <button
+          className="mnemonic-button dark:bg-gray-700 bg-gray-200 dark:hover:bg-gray-600 hover:bg-gray-300 text-gray-900 dark:text-gray-100 py-2 px-4 rounded"
+          onClick={async function () {
+            const mn = await generateMnemonic();
+            setMnemonic(mn);
+          }}
+        >
+          Generate Secret Phrase
+        </button>
+      </header>
+
+      <div className="w-1/2 mnemonic-container dark:bg-gray-800 bg-gray-100 rounded-lg mt-4 p-4">
         <div className="mnemonic-header flex justify-between items-center">
           <button
             className="hide-show-button dark:bg-gray-600 bg-gray-300 hover:bg-gray-400 dark:hover:bg-gray-500 text-gray-900 dark:text-gray-100 py-2 px-4 rounded"

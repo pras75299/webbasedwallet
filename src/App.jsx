@@ -1,19 +1,28 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { generateMnemonic } from "bip39";
 import "./App.css";
 import { SolanaWallet } from "./components/SolanaWallet";
 import { EthWallet } from "./components/EthWallet";
+import { ThemeProvider, useTheme } from "./context/Theme"; // Import useTheme here
+import ThemeButton from "./components/ThemeButton";
 
-function App() {
+function AppContent() {
   const [mnemonic, setMnemonic] = useState("");
   const [isMnemonicVisible, setMnemonicVisible] = useState(true);
   const isDisabled = !mnemonic;
+  const { themeMode } = useTheme();
+
+  useEffect(() => {
+    document.querySelector("html").classList.remove("light", "dark");
+    document.querySelector("html").classList.add(themeMode);
+  }, [themeMode]);
 
   return (
     <div className="container mx-auto p-4 dark:bg-gray-900 bg-white dark:text-gray-100 text-gray-900 min-h-screen">
       <h1 className="text-3xl font-bold underline dark:text-white text-gray-800">
         Secret Phrase
       </h1>
+      <ThemeButton />
       <button
         className="mnemonic-button dark:bg-gray-700 bg-gray-200 dark:hover:bg-gray-600 hover:bg-gray-300 text-gray-900 dark:text-gray-100 py-2 px-4 rounded mt-4"
         onClick={async function () {
@@ -53,20 +62,28 @@ function App() {
 
       <div className="wallet-container mt-6">
         <div className="wallet-box dark:bg-gray-800 bg-gray-100 rounded-lg p-4 mb-4">
-          <h2 className="text-2xl font-bold dark:text-white text-gray-800">
+          <h2 className="text-2xl font-bold dark:text-white text-gray-900">
             Generate SOLANA Wallet
           </h2>
           <SolanaWallet mnemonic={mnemonic} disabled={isDisabled} />
         </div>
 
         <div className="wallet-box dark:bg-gray-800 bg-gray-100 rounded-lg p-4">
-          <h2 className="text-2xl font-bold dark:text-white text-gray-800">
+          <h2 className="text-2xl font-bold  dark:text-white text-black-900">
             Generate ETHEREUM Wallet
           </h2>
           <EthWallet mnemonic={mnemonic} disabled={isDisabled} />
         </div>
       </div>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }
 

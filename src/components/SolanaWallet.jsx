@@ -1,43 +1,101 @@
-import { useState } from "react";
-import { mnemonicToSeed } from "bip39";
-import { derivePath } from "ed25519-hd-key";
-import { Keypair } from "@solana/web3.js";
-import nacl from "tweetnacl";
+import { useState, useEffect } from "react";
+import {
+  Connection,
+  PublicKey,
+  Keypair,
+  SystemProgram,
+  Transaction,
+} from "@solana/web3.js";
 
 export function SolanaWallet({ mnemonic, disabled }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [publicKeys, setPublicKeys] = useState([]);
+  const [balances, setBalances] = useState({});
+  const [recipient, setRecipient] = useState("");
+  const [amount, setAmount] = useState("");
+
+  const connection = new Connection(
+    "https://solana-mainnet.g.alchemy.com/v2/AAsuireGss8ZoU0addiRUyVIG5GJE9tw"
+  );
+  const fetchBalance = async (publicKey) => {
+    const balance = await connection.getBalance(new PublicKey(publicKey));
+    return balance / 1e9; // Convert lamports to SOL
+  };
+
+  const updateBalances = async () => {
+    const newBalances = {};
+    for (const publicKey of publicKeys) {
+      newBalances[publicKey.toBase58()] = await fetchBalance(publicKey);
+    }
+    setBalances(newBalances);
+  };
+
+  useEffect(() => {
+    if (publicKeys.length > 0) {
+      updateBalances();
+    }
+  }, [publicKeys]);
 
   return (
-    <div className="solana-wallet">
+    <div>
       <button
-        className="wallet-button dark:bg-gray-700 bg-gray-300 dark:hover:bg-gray-600 hover:bg-gray-400 text-gray-900 dark:text-gray-100 py-2 px-4 rounded mb-4"
+        className="wallet-button"
         disabled={disabled}
-        onClick={function () {
-          const seed = mnemonicToSeed(mnemonic);
-          const path = `m/44'/501'/${currentIndex}'/0'`;
-          const derivedSeed = derivePath(path, seed.toString("hex")).key;
-          const secret = nacl.sign.keyPair.fromSeed(derivedSeed).secretKey;
-          const keypair = Keypair.fromSecretKey(secret);
+        onClick={async function () {
+          const keypair = Keypair.generate(); // Generate Solana keypair
+          setPublicKeys((prev) => [...prev, keypair.publicKey]);
           setCurrentIndex(currentIndex + 1);
-          setPublicKeys([...publicKeys, keypair.publicKey]);
         }}
       >
-        Generate SOLANA Wallet
+        Generate Solana Wallet
       </button>
 
       {publicKeys.map((publicKey, index) => (
-        <div
-          key={index}
-          className="dark:bg-gray-800 bg-gray-200 p-2 rounded mb-2"
-        >
-          <input
-            value={`Address: ${publicKey.toBase58()}`}
-            readOnly
-            className="bg-transparent dark:text-gray-100 text-gray-900 w-full"
-          />
+        <div key={index}>
+          <div>
+            <strong>Address:</strong> {publicKey.toBase58()}
+          </div>
+          <div>
+            <strong>Balance:</strong>{" "}
+            {balances[publicKey.toBase58()] || "Loading..."} SOL
+          </div>
         </div>
       ))}
+      <div className="mt-4">
+        <input
+          type="text"
+          placeholder="Recipient Address"
+          onChange={(e) => setRecipient(e.target.value)}
+          className="input"
+        />
+        <input
+          type="number"
+          placeholder="Amount (SOL)"
+          onChange={(e) => setAmount(e.target.value)}
+          className="input"
+        />
+        <button
+          className="send-button"
+          onClick={async () => {
+            const senderKeypair = Keypair.generate(); // Replace with stored keypair or mnemonic-derived keypair
+            const transaction = new Transaction().add(
+              SystemProgram.transfer({
+                fromPubkey: senderKeypair.publicKey,
+                toPubkey: new PublicKey(recipient),
+                lamports: amount * 1e9, // Convert SOL to lamports
+              })
+            );
+
+            const signature = await connection.sendTransaction(transaction, [
+              senderKeypair,
+            ]);
+            await connection.confirmTransaction(signature);
+            alert(`Transaction successful: ${signature}`);
+          }}
+        >
+          Send SOL
+        </button>
+      </div>
     </div>
   );
 }
